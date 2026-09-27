@@ -4,7 +4,7 @@ Laboratorio personal de infraestructura IT creado para practicar y documentar la
 
 El proyecto se desarrolla por fases y cada fase queda documentada con configuraciones, pruebas, capturas de pantalla y resolución de incidencias.
 
-> **Objetivo:** aprender haciendo. Desplegar servicios, configurarlos, realizar pruebas, detectar problemas, resolverlos y documentar el proceso.
+**Objetivo:** aprender haciendo. Desplegar servicios, configurarlos, realizar pruebas, detectar problemas, resolverlos y documentar el proceso.
 
 ---
 
@@ -65,7 +65,7 @@ Red física
 | `SEC01`    | `192.168.10.50` | Seguridad          |
 | `WIN10-01` | DHCP            | Cliente Windows    |
 
-> Algunas máquinas forman parte de la planificación futura y todavía no están desplegadas.
+Algunas máquinas forman parte de la planificación futura y todavía no están desplegadas.
 
 ---
 
