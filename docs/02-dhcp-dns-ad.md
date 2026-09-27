@@ -24,6 +24,7 @@ El servidor `DC01` actúa como:
 Se utiliza una dirección IP estática para DC01 debido a que los servicios de infraestructura, especialmente DNS y Active Directory, necesitan una dirección conocida y estable dentro de la red.
 
 ---
+![Configuración IP de DC01](../screenshots/02-dc01-ip.png)
 
 ## DHCP
 
@@ -51,6 +52,8 @@ El rango configurado para los clientes DHCP es:
 
 Las direcciones inferiores se mantienen disponibles para servidores y dispositivos de infraestructura con direcciones estáticas.
 
+![Configuración del ámbito DHCP AVILA-LAB](../screenshots/04-dhcp-scope.png)
+
 ### Opciones DHCP
 
 Se configuraron las siguientes opciones:
@@ -64,6 +67,8 @@ Se configuraron las siguientes opciones:
 El gateway `192.168.10.1` corresponde al firewall/router que se incorporará posteriormente al laboratorio mediante pfSense.
 
 Por este motivo, durante esta fase los clientes pueden comunicarse dentro de la red del laboratorio, pero todavía no disponen de salida a Internet a través de un gateway funcional.
+
+![Opciones del ámbito DHCP](../screenshots/05-dhcp-options.png)
 
 ### Prueba DHCP
 
