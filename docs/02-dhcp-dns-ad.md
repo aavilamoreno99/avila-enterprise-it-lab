@@ -93,6 +93,7 @@ La zona DNS principal del laboratorio es:
 ```text
 avila-tech.local
 ```
+![Zona DNS del dominio avila-tech.local](../screenshots/06-dns-zone.png)
 
 DC01 actúa como servidor DNS para los equipos del dominio.
 
