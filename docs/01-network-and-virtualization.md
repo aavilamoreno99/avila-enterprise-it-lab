@@ -45,6 +45,10 @@ Las máquinas virtuales utilizan la siguiente red interna:
 
 El uso de una red interna permite aislar el laboratorio de la red física del equipo anfitrión, manteniendo la comunicación entre las máquinas virtuales conectadas a `AVILA-LAB`.
 
+### Configuración de la red interna en VirtualBox
+
+![Configuración de la red interna AVILA-LAB](../screenshots/01-network/01-virtualbox-network.png)
+
 ## Plan de direccionamiento
 
 El direccionamiento previsto para la infraestructura es:
@@ -60,6 +64,12 @@ El direccionamiento previsto para la infraestructura es:
 | WIN10-01       |            DHCP | Cliente Windows                     |
 
 Las direcciones destinadas a los servidores de infraestructura quedan fuera del rango DHCP para poder utilizarlas como direcciones estáticas.
+
+### Configuración de red de DC01
+
+La máquina DC01 utiliza la dirección IP estática `192.168.10.10`.
+
+![Configuración IP de DC01](../screenshots/01-network/02-dc01-ip.png)
 
 ## Rango DHCP
 
@@ -82,6 +92,8 @@ ping 192.168.10.10
 ```
 
 Las respuestas recibidas confirmaron la comunicación entre el cliente Windows y DC01.
+
+![Prueba de conectividad entre WIN10-01 y DC01](../screenshots/01-network/03-ping-dc01.png)
 
 ## Resultado
 
