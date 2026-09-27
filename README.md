@@ -65,7 +65,7 @@ Red física
 | `SEC01`    | `192.168.10.50` | Seguridad          |
 | `WIN10-01` | DHCP            | Cliente Windows    |
 
-> Algunas máquinas forman parte de la planificación futura y todavía no están desplegadas.
+Algunas máquinas forman parte de la planificación futura y todavía no están desplegadas.
 
 ---
 
@@ -73,7 +73,7 @@ Red física
 
 ### 🟢 Completado
 
-* [x] Configuración de red virtual con VirtualBox
+*[x] Configuración de red virtual con VirtualBox
 * [x] Red interna `AVILA-LAB`
 * [x] Configuración IP de servidores
 * [x] Instalación y configuración de Windows Server
