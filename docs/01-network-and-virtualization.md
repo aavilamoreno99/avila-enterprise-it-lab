@@ -47,7 +47,7 @@ El uso de una red interna permite aislar el laboratorio de la red física del eq
 
 ### Configuración de la red interna en VirtualBox
 
-![Configuración de la red interna AVILA-LAB](../screenshots/01-network/01-virtualbox-network.png)
+![Configuración de la red interna AVILA-LAB](../screenshots/01-virtualbox-network.png)
 
 ## Plan de direccionamiento
 
@@ -69,7 +69,7 @@ Las direcciones destinadas a los servidores de infraestructura quedan fuera del 
 
 La máquina DC01 utiliza la dirección IP estática `192.168.10.10`.
 
-![Configuración IP de DC01](../screenshots/01-network/02-dc01-ip.png)
+![Configuración IP de DC01](../screenshots/02-dc01-ip.png)
 
 ## Rango DHCP
 
@@ -93,7 +93,7 @@ ping 192.168.10.10
 
 Las respuestas recibidas confirmaron la comunicación entre el cliente Windows y DC01.
 
-![Prueba de conectividad entre WIN10-01 y DC01](../screenshots/01-network/03-ping-dc01.png)
+![Prueba de conectividad entre WIN10-01 y DC01](../screenshots/03-ping-dc01.png)
 
 ## Resultado
 
