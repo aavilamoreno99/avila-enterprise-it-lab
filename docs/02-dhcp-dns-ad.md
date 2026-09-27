@@ -129,6 +129,8 @@ Posteriormente, DC01 fue promocionado como controlador de dominio creando un nue
 avila-tech.local
 ```
 
+![Estructura de Active Directory](../screenshots/07-active-directory.png)
+
 ### Configuración principal
 
 * Nuevo bosque: `avila-tech.local`
