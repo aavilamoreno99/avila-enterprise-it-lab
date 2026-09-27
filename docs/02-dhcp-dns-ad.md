@@ -193,6 +193,9 @@ Las comprobaciones se completaron correctamente sin errores críticos.
 
 ---
 
+```markdown
+![Diagnóstico del controlador de dominio mediante dcdiag](../screenshots/08-dcdiag.png)
+
 ## Resultado
 
 DC01 quedó configurado como la infraestructura principal del laboratorio, proporcionando:
