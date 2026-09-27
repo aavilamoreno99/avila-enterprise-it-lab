@@ -8,7 +8,7 @@ El proyecto se desarrolla por fases y cada fase queda documentada con configurac
 
 ---
 
-## 🏗️ Arquitectura del laboratorio
+## Arquitectura del laboratorio
 
 Actualmente la infraestructura utiliza una red virtual aislada:
 
@@ -125,7 +125,7 @@ Red física
 
 ---
 
-# 📚 Documentación
+# Documentación
 
 Cada fase del laboratorio se documenta individualmente:
 
@@ -142,7 +142,7 @@ Las nuevas fases se irán incorporando a esta tabla a medida que avance el labor
 
 ---
 
-# 🔐 Active Directory
+# Active Directory
 
 Dominio utilizado:
 
@@ -184,7 +184,7 @@ GG-Administracion
 
 ---
 
-# 🗄️ File Server
+# File Server
 
 `FILE01` proporciona recursos compartidos SMB para diferentes departamentos:
 
@@ -213,7 +213,7 @@ Se han realizado pruebas de acceso utilizando diferentes usuarios del dominio pa
 
 ---
 
-# 🛠️ Tecnologías
+# Tecnologías
 
 ### Infraestructura
 
@@ -267,7 +267,7 @@ Se han realizado pruebas de acceso utilizando diferentes usuarios del dominio pa
 
 ---
 
-# 🎯 Objetivos de aprendizaje
+# Objetivos de aprendizaje
 
 El laboratorio está orientado principalmente a practicar:
 
@@ -287,7 +287,7 @@ El objetivo no es únicamente desplegar servicios, sino **entender cómo funcion
 
 ---
 
-# 🧪 Metodología
+# Metodología
 
 Cada nueva fase sigue, siempre que sea posible, este proceso:
 
@@ -311,7 +311,7 @@ De esta forma, el laboratorio no se limita a una instalación de servicios, sino
 
 ---
 
-# 📸 Documentación visual
+# Documentación visual
 
 Las configuraciones importantes se acompañan de capturas de pantalla y ejemplos reales realizados dentro del laboratorio.
 
@@ -329,7 +329,7 @@ diagrams/
 
 ---
 
-# 🚀 Evolución del proyecto
+# Evolución del proyecto
 
 Este laboratorio es un proyecto en evolución. La infraestructura se irá ampliando progresivamente para incorporar nuevos servicios, tecnologías y escenarios de troubleshooting.
 
@@ -337,7 +337,7 @@ La planificación puede cambiar a medida que se incorporen nuevos objetivos o se
 
 ---
 
-## 👤 Autor
+## Autor
 
 **Alejandro Ávila Moreno**
 
