@@ -18,7 +18,7 @@ Red física
        │
        │
    HOST Windows
-   192.168.0.14
+   192.168.0.X
        │
        │ VirtualBox
        │
