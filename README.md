@@ -71,7 +71,7 @@ Algunas máquinas forman parte de la planificación futura y todavía no están 
 
 # Estado del proyecto
 
-## Completado
+## 🟢 Completado
 
 * [x] Configuración de red virtual con VirtualBox
 * [x] Red interna `AVILA-LAB`
@@ -89,7 +89,7 @@ Algunas máquinas forman parte de la planificación futura y todavía no están 
 * [x] Permisos NTFS
 * [x] Pruebas de acceso mediante grupos de seguridad
 
-## En desarrollo
+## 🟡 En desarrollo
 
 * [ ] Mapeo automático de unidades de red mediante GPO
 * [ ] Gestión avanzada de GPO
@@ -100,7 +100,7 @@ Algunas máquinas forman parte de la planificación futura y todavía no están 
 * [ ] Gestión de usuarios y equipos mediante PowerShell
 * [ ] Scripts de administración y mantenimiento
 
-## Planificado
+## 🔵 Planificado
 
 * [ ] Despliegue de `LINUX01`
 * [ ] Administración de Linux
