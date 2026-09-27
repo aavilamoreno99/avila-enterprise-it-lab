@@ -90,11 +90,11 @@ Esta separación permitirá aplicar diferentes políticas de grupo dependiendo d
 
 Se verificó desde **Usuarios y equipos de Active Directory** que:
 
-* Las unidades organizativas existen correctamente.
-* Los usuarios se encuentran en las OUs correspondientes.
-* Los grupos de seguridad están creados.
-* Los usuarios pertenecen a los grupos correspondientes.
-* La estructura del dominio se mantiene organizada.
+· Las unidades organizativas existen correctamente.
+· Los usuarios se encuentran en las OUs correspondientes.
+· Los grupos de seguridad están creados.
+· Los usuarios pertenecen a los grupos correspondientes.
+· La estructura del dominio se mantiene organizada.
 
 ## Resultado
 
