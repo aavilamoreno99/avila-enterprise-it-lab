@@ -4,7 +4,7 @@ Laboratorio personal de infraestructura IT creado para practicar, documentar y s
 
 El proyecto se desarrolla por fases y cada fase queda documentada con configuraciones, pruebas y capturas de pantalla.
 
-> **Objetivo:** construir progresivamente una infraestructura IT completa y documentar técnicamente cada componente para poder consultar el proceso, solucionar incidencias y demostrar los conocimientos adquiridos.
+**Objetivo:** construir progresivamente una infraestructura IT completa y documentar técnicamente cada componente para poder consultar el proceso, solucionar incidencias y demostrar los conocimientos adquiridos.
 
 ---
 
