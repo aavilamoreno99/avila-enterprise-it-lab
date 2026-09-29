@@ -235,4 +235,3 @@ Usuarios
 
 La política utilizada como prueba impide que los usuarios de soporte puedan modificar el fondo de escritorio.
 
-![GPO vinculada](../screenshots/11-gpo)
