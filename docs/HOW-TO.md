@@ -235,3 +235,219 @@ Usuarios
 
 La política utilizada como prueba impide que los usuarios de soporte puedan modificar el fondo de escritorio.
 
+![GPO vinculada](../screenshots/11-gpo-linked.png)
+
+Configuración aplicada:
+
+![Configuración GPO](../screenshots/12-gpo-setting.png)
+
+La intención de esta configuración no es únicamente modificar una opción de Windows, sino comprobar el funcionamiento de la administración centralizada mediante Active Directory.
+
+---
+
+# 6. Incorporación de un cliente al dominio
+
+Con los servicios de infraestructura funcionando, se configuró `WIN10-01` como equipo cliente.
+
+El equipo obtiene su configuración de red mediante DHCP y utiliza `DC01` como servidor DNS.
+
+Posteriormente se incorporó al dominio:
+
+```text
+avila-tech.local
+```
+
+![Unión al dominio](../screenshots/13-domain-join.png)
+
+Una vez reiniciado el equipo se realizó una prueba iniciando sesión con un usuario del dominio.
+
+![Usuario de dominio](../screenshots/14-domain-user.png)
+
+También se utilizaron comandos de comprobación:
+
+```powershell
+whoami
+gpupdate /force
+gpresult /r
+```
+
+Estas pruebas permiten comprobar la identidad utilizada y verificar que las políticas de grupo se aplican correctamente.
+
+---
+
+# 7. Servidor de archivos FILE01
+
+Para separar los servicios de dominio del almacenamiento se creó un segundo servidor:
+
+```text
+FILE01
+192.168.10.20
+```
+
+`FILE01` ejecuta Windows Server 2025 y está unido al dominio:
+
+```text
+avila-tech.local
+```
+
+![Configuración IP de FILE01](../screenshots/15-file01-ip.png)
+
+![FILE01 unido al dominio](../screenshots/16-file01-domain.png)
+
+Se instaló el rol **File Server** para proporcionar almacenamiento compartido a los diferentes departamentos.
+
+---
+
+## 7.1 Estructura de carpetas
+
+En `FILE01` se creó:
+
+```text
+C:\Departamentos
+│
+├── IT
+├── Soporte
+└── Administracion
+```
+
+![Estructura de carpetas](../screenshots/17-file-server-folders.png)
+
+La separación permite aplicar permisos diferentes según el departamento.
+
+---
+
+## 7.2 Permisos NTFS
+
+Los permisos se gestionan mediante los grupos de seguridad de Active Directory.
+
+```text
+IT
+└── GG-IT → Modify
+
+Soporte
+└── GG-Soporte → Modify
+
+Administracion
+└── GG-Administracion → Modify
+```
+
+Se deshabilitó la herencia en las carpetas departamentales para evitar que permisos generales del directorio superior proporcionasen acceso no deseado.
+
+Se conservaron las entradas necesarias para el funcionamiento del sistema y la administración del servidor.
+
+![Permisos NTFS](../screenshots/18-file-server-permissions.png)
+
+El control de acceso se basa en la pertenencia a grupos, evitando asignar permisos individualmente a cada usuario.
+
+---
+
+## 7.3 Recursos compartidos SMB
+
+Las carpetas se publicaron mediante SMB:
+
+```text
+\\FILE01\IT
+\\FILE01\Soporte
+\\FILE01\Administracion
+```
+
+![Recursos SMB](../screenshots/19-file-server-shares.png)
+
+Los permisos efectivos se controlan principalmente mediante NTFS, mientras que SMB proporciona el acceso a los recursos compartidos a través de la red.
+
+---
+
+# 8. Validación del acceso
+
+La configuración se validó desde `WIN10-01` utilizando diferentes usuarios del dominio.
+
+### Alejandro
+
+Pertenece a:
+
+```text
+GG-IT
+```
+
+Resultado:
+
+```text
+IT              ✓
+Soporte         ✗
+Administracion  ✗
+```
+
+### Manuel
+
+Pertenece a:
+
+```text
+GG-Soporte
+```
+
+Resultado:
+
+```text
+IT              ✗
+Soporte         ✓
+Administracion  ✗
+```
+
+### Belen
+
+Pertenece a:
+
+```text
+GG-Administracion
+```
+
+Resultado:
+
+```text
+IT              ✗
+Soporte         ✗
+Administracion  ✓
+```
+
+Estas pruebas permiten comprobar que la estructura de grupos de Active Directory se está utilizando correctamente para controlar el acceso a los recursos del servidor.
+
+---
+
+# 9. Resultado actual
+
+La infraestructura construida hasta este punto dispone de:
+
+```text
+                         AVILA-LAB
+                      192.168.10.0/24
+                             |
+          +------------------+------------------+
+          |                  |                  |
+        DC01               FILE01           WIN10-01
+     .10 /24             .20 /24               DHCP
+          |                  |                  |
+      AD / DNS            SMB / NTFS        Windows
+        DHCP                 |                  |
+          |                  +--------+---------+
+          |                           |
+          +------- avila-tech.local ---+
+```
+
+Actualmente se ha validado:
+
+* Conectividad de red.
+* DHCP.
+* Resolución DNS.
+* Funcionamiento de Active Directory.
+* Organización mediante OUs.
+* Usuarios y grupos.
+* Aplicación de GPO.
+* Unión de equipos al dominio.
+* Autenticación de usuarios.
+* Recursos SMB.
+* Permisos NTFS.
+* Control de acceso por departamento.
+
+Esta infraestructura constituye la base sobre la que continuará evolucionando el proyecto.
+
+Las siguientes ampliaciones se incorporarán sobre esta infraestructura, añadiendo nuevas necesidades de red, sistemas, seguridad, monitorización, conectividad entre sedes y servicios cloud.
