@@ -451,3 +451,254 @@ Actualmente se ha validado:
 Esta infraestructura constituye la base sobre la que continuará evolucionando el proyecto.
 
 Las siguientes ampliaciones se incorporarán sobre esta infraestructura, añadiendo nuevas necesidades de red, sistemas, seguridad, monitorización, conectividad entre sedes y servicios cloud.
+
+## 10. FW01 — Gateway, NAT y Firewall
+
+Para proporcionar salida a Internet a la red interna del laboratorio se incorporó un servidor Ubuntu Server como gateway y firewall.
+
+FW01 dispone de dos interfaces de red:
+
+* **WAN (`enp0s3`)**: conectada al adaptador NAT de VirtualBox y utilizada para acceder a Internet.
+* **LAN (`enp0s8`)**: conectada a la red interna `AVILA-LAB`, donde se encuentran los servidores y clientes del dominio.
+
+La arquitectura resultante es:
+
+```text
+                         INTERNET
+                            │
+                       VirtualBox NAT
+                            │
+                    ┌───────────────┐
+                    │     FW01      │
+                    │ Ubuntu Server │
+                    └───────┬───────┘
+                       WAN  │  LAN
+                   10.0.2.15│192.168.10.1
+                            │
+                       AVILA-LAB
+                    192.168.10.0/24
+                            │
+              ┌─────────────┼─────────────┐
+              │             │             │
+            DC01          FILE01       WIN10-01
+            .10             .20           .100
+```
+
+### 10.1 Conexión de los adaptadores
+
+La interfaz WAN de FW01 utiliza el modo **NAT de VirtualBox**. De esta forma, la máquina virtual puede acceder a Internet utilizando la conectividad del equipo físico.
+
+La segunda interfaz utiliza una **Red interna** denominada `AVILA-LAB`. Esta red está aislada del resto de redes de VirtualBox y constituye la LAN del laboratorio.
+
+![Adaptador WAN de FW01](../screenshots/31-fw01-wan-virtualbox.png)
+
+![Adaptador LAN de FW01](../screenshots/32-fw01-lan-virtualbox.png)
+
+### 10.2 Interfaces de red
+
+Las interfaces de FW01 quedan configuradas de la siguiente manera:
+
+| Interfaz | Red | Dirección         | Función                   |
+| -------- | --- | ----------------- | ------------------------- |
+| `enp0s3` | WAN | `10.0.2.15`       | Salida hacia Internet     |
+| `enp0s8` | LAN | `192.168.10.1/24` | Gateway de la red interna |
+
+La configuración se comprueba mediante:
+
+```bash
+ip addr
+```
+
+![Interfaces de red de FW01](../screenshots/30-fw01-interfaces.png)
+
+### 10.3 Tabla de routing
+
+FW01 dispone de rutas para ambas redes y una ruta por defecto hacia la red WAN.
+
+```bash
+ip route
+```
+
+La red `192.168.10.0/24` está asociada a la interfaz LAN, mientras que la ruta por defecto permite enviar el tráfico externo a través de la interfaz WAN.
+
+![Tabla de routing de FW01](../screenshots/33-fw01-routing.png)
+
+### 10.4 Habilitación del reenvío IP
+
+Para que FW01 pueda actuar como router es necesario habilitar el reenvío de paquetes IPv4.
+
+La configuración se estableció de forma persistente mediante:
+
+```text
+net.ipv4.ip_forward=1
+```
+
+El estado actual puede comprobarse con:
+
+```bash
+sysctl net.ipv4.ip_forward
+```
+
+El resultado esperado es:
+
+```text
+net.ipv4.ip_forward = 1
+```
+
+![IP forwarding habilitado](../screenshots/34-fw01-ip-forward.png)
+
+Con esta configuración, FW01 puede recibir tráfico procedente de la LAN y reenviarlo hacia la WAN.
+
+### 10.5 NAT para la salida a Internet
+
+Los equipos de la LAN utilizan direcciones privadas de la red `192.168.10.0/24`. Para permitir su salida a Internet se configuró NAT mediante `MASQUERADE`.
+
+```bash
+sudo iptables -t nat -A POSTROUTING -o enp0s3 -j MASQUERADE
+```
+
+La regla se aplica al tráfico que abandona FW01 por la interfaz WAN.
+
+```text
+WIN10-01
+192.168.10.100
+      │
+      ▼
+192.168.10.1
+   FW01 LAN
+      │
+      │ NAT
+      ▼
+10.0.2.15
+   FW01 WAN
+      │
+      ▼
+  INTERNET
+```
+
+La regla puede comprobarse mediante:
+
+```bash
+sudo iptables -t nat -L POSTROUTING -n -v
+```
+
+![NAT de FW01](../screenshots/35-fw01-nat.png)
+
+### 10.6 Filtrado del tráfico
+
+Además del routing y NAT, FW01 actúa como firewall mediante `iptables`.
+
+Se estableció una política de **denegación por defecto** para el tráfico que atraviesa el firewall:
+
+```bash
+sudo iptables -P FORWARD DROP
+```
+
+A partir de esta política se permiten explícitamente las comunicaciones necesarias.
+
+El tráfico iniciado desde la LAN hacia Internet está permitido:
+
+```bash
+sudo iptables -A FORWARD -i enp0s8 -o enp0s3 -j ACCEPT
+```
+
+Las respuestas procedentes de Internet solo se permiten cuando pertenecen a conexiones ya establecidas:
+
+```bash
+sudo iptables -A FORWARD -i enp0s3 -o enp0s8 \
+-m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+```
+
+De esta forma, FW01 no permite de forma general conexiones iniciadas desde la WAN hacia la red interna.
+
+La configuración actual puede comprobarse mediante:
+
+```bash
+sudo iptables -L FORWARD --line-numbers -n
+```
+
+![Reglas de filtrado de FW01](../screenshots/37-fw01-forward-rules.png)
+
+### 10.7 Registro de tráfico bloqueado
+
+Para disponer de visibilidad sobre el tráfico que alcanza la política de denegación se añadió una regla de logging limitada a cinco eventos por minuto:
+
+```bash
+sudo iptables -A FORWARD -m limit --limit 5/min -j LOG \
+--log-prefix "FW01-DROP: " --log-level 4
+```
+
+El límite evita generar una cantidad excesiva de registros en caso de recibir mucho tráfico bloqueado.
+
+Los mensajes generados por `iptables` se gestionan mediante `rsyslog`.
+
+La configuración utilizada es:
+
+```text
+:msg,contains,"FW01-DROP:" /var/log/iptables.log
+& stop
+```
+
+![Configuración de rsyslog](../screenshots/36-fw01-rsyslog-config.png)
+
+Los eventos registrados pueden consultarse mediante:
+
+```bash
+sudo tail -20 /var/log/iptables.log
+```
+
+Los registros contienen información útil para identificar el tráfico bloqueado, como:
+
+* Interfaz de entrada y salida.
+* Dirección IP de origen.
+* Dirección IP de destino.
+* Protocolo.
+* Puerto de origen y destino.
+* Información adicional del paquete.
+
+![Registro de tráfico bloqueado](../screenshots/38-fw01-iptables-log.png)
+
+### 10.8 Persistencia de la configuración
+
+Para evitar perder las reglas del firewall después de reiniciar FW01 se utilizó `iptables-persistent`.
+
+La configuración actual se guarda mediante:
+
+```bash
+sudo netfilter-persistent save
+```
+
+y puede recargarse con:
+
+```bash
+sudo netfilter-persistent reload
+```
+
+De esta forma, la configuración de NAT y filtrado permanece disponible después de un reinicio del servidor.
+
+### 10.9 Resultado
+
+FW01 actúa actualmente como **gateway, router, dispositivo NAT y firewall** de la infraestructura.
+
+El flujo de salida queda definido de la siguiente manera:
+
+```text
+192.168.10.0/24
+       │
+       ▼
+     FW01
+       │
+  FORWARD
+       │
+       ▼
+      NAT
+       │
+       ▼
+     WAN
+       │
+       ▼
+   INTERNET
+```
+
+La política de seguridad sigue el principio de **denegar por defecto y permitir únicamente el tráfico necesario**, mientras que los intentos de tráfico bloqueado quedan registrados para facilitar su análisis.
+
