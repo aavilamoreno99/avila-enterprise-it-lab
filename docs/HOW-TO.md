@@ -509,7 +509,7 @@ La configuración se comprueba mediante:
 ip addr
 ```
 
-![Interfaces de red de FW01](../screenshots/30-fw01-interfaces.png)
+![Interfaces de red de FW01](../screenshots/30-fw01-forward-rules.png)
 
 ### 10.3 Tabla de routing
 
