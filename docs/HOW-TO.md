@@ -21,11 +21,13 @@ Dominio:    avila-tech.local
 
 ### Equipos
 
-| Equipo   | IP            | Función                      |
-| -------- | ------------- | ---------------------------- |
-| DC01     | 192.168.10.10 | Active Directory, DNS y DHCP |
-| FILE01   | 192.168.10.20 | File Server                  |
-| WIN10-01 | DHCP          | Cliente Windows              |
+| Equipo   | Sistema operativo       | IP LAN         | Función                                  |
+| -------- | ----------------------- | -------------- | ---------------------------------------- |
+| FW01     | Ubuntu Server 24.04 LTS | 192.168.10.1   | Gateway, routing, NAT y firewall         |
+| DC01     | Windows Server 2025     | 192.168.10.10  | Active Directory, DNS y DHCP             |
+| FILE01   | Windows Server 2025     | 192.168.10.20  | File Server, SMB y NTFS                  |
+| ZABBIX01 | Ubuntu Server 24.04 LTS | 192.168.10.30  | Zabbix Server y monitorización           |
+| WIN10-01 | Windows 10              | DHCP (.100)    | Cliente Windows unido al dominio         |
 
 La separación entre `DC01` y `FILE01` permite mantener los servicios de dominio separados del almacenamiento y los recursos compartidos.
 
@@ -509,7 +511,7 @@ La configuración se comprueba mediante:
 ip addr
 ```
 
-![Interfaces de red de FW01](../screenshots/30-fw01-forward-rules.png)
+![Interfaces de red de FW01](../screenshots/30-fw01-interfaces.png)
 
 ### 10.3 Tabla de routing
 
@@ -702,3 +704,119 @@ El flujo de salida queda definido de la siguiente manera:
 
 La política de seguridad sigue el principio de **denegar por defecto y permitir únicamente el tráfico necesario**, mientras que los intentos de tráfico bloqueado quedan registrados para facilitar su análisis.
 
+---
+
+# 11. Monitorización con Zabbix
+
+Se incorporó ZABBIX01 para disponer de una plataforma centralizada desde la que consultar el estado y el rendimiento de los servidores del laboratorio.
+
+## 11.1 Servidor de monitorización
+
+ZABBIX01 utiliza Ubuntu Server 24.04 LTS y tiene la dirección IP `192.168.10.30` en la red interna `AVILA-LAB`.
+
+Los componentes instalados son:
+
+- Zabbix Server 7.2.15.
+- PostgreSQL como base de datos.
+- Apache y PHP para la interfaz web.
+- Zabbix Agent 2 en el propio servidor.
+
+La interfaz web se encuentra disponible en:
+
+```text
+http://192.168.10.30/zabbix
+```
+
+![Configuración del frontend de Zabbix](../screenshots/40-zabbix-frontend-config.png)
+
+Esta captura documenta la configuración del frontend web. La disponibilidad de la interfaz confirma que el componente web se ha desplegado y puede utilizarse para administrar la plataforma.
+
+## 11.2 Incorporación de DC01
+
+Se añadió `DC01` como equipo monitorizado, utilizando su dirección LAN `192.168.10.10` y el agente de Zabbix.
+
+La configuración del host utiliza:
+
+```text
+Host:       DC01
+IP agente:  192.168.10.10
+Puerto:     10050
+Plantilla:  Windows by Zabbix agent active
+```
+
+El host aparece disponible en Zabbix y se reciben métricas mediante el agente. La plantilla permite recopilar datos del sistema Windows, incluidos recursos y rendimiento.
+
+## 11.3 Incorporación de FILE01
+
+También se añadió `FILE01`, que utiliza la dirección `192.168.10.20`.
+
+La configuración del agente en FILE01 utiliza los siguientes parámetros:
+
+```text
+Server=192.168.10.30
+ServerActive=192.168.10.30
+Hostname=FILE01
+```
+
+El servicio Zabbix Agent 2 está configurado para comunicarse con ZABBIX01. En el frontend se creó el host con estos parámetros:
+
+```text
+Host:       FILE01
+IP agente:  192.168.10.20
+Puerto:     10050
+Plantilla:  Windows by Zabbix agent active
+```
+
+La disponibilidad del agente y la recepción de métricas se comprobaron desde la interfaz de Zabbix.
+
+![Gráfica de CPU de FILE01](../screenshots/41-zabbix-file01-cpu.png)
+
+La gráfica permite observar la métrica de CPU recogida para FILE01 durante el intervalo mostrado.
+
+![Métricas de FILE01](../screenshots/42-zabbix-file01-metrics.png)
+
+La vista de métricas muestra los elementos de monitorización asociados al host y permite comprobar que Zabbix está recogiendo datos.
+
+## 11.4 Estado actual y alcance
+
+La monitorización se ha validado con dos servidores Windows:
+
+- `DC01` (`192.168.10.10`).
+- `FILE01` (`192.168.10.20`).
+
+ZABBIX01 permanece como servidor central de monitorización sobre Ubuntu Server. Por ahora no se ha instalado el agente en FW01; esta tarea se pospone y no bloquea el funcionamiento de la monitorización de los dos servidores Windows.
+
+La configuración actual demuestra que la plataforma está desplegada y recoge métricas. El uso operativo avanzado queda pendiente para una fase posterior, en la que se practicarán alertas, iniciadores, umbrales, análisis de eventos y diagnóstico de problemas.
+
+---
+
+## 12. Estado actualizado del laboratorio
+
+La infraestructura documentada incluye actualmente:
+
+```text
+                         INTERNET
+                             |
+                      VirtualBox NAT
+                             |
+                           FW01
+                   Ubuntu / Routing / NAT
+                    LAN: 192.168.10.1
+                             |
+                       AVILA-LAB
+                     192.168.10.0/24
+              +--------------+--------------+
+              |              |              |
+            DC01           FILE01        WIN10-01
+            .10              .20          DHCP (.100)
+        AD/DNS/DHCP       SMB / NTFS      Cliente dominio
+              |
+              +---------- ZABBIX01
+                          .30
+                     Zabbix Server
+                          |
+                   Monitoriza DC01
+                     y FILE01
+```
+
+Se han desplegado y validado los servicios de dominio y archivos, la conectividad a través de FW01 y la monitorización de DC01 y FILE01. Las siguientes ampliaciones deben partir de esta base y documentarse después de realizar las pruebas correspondientes.
