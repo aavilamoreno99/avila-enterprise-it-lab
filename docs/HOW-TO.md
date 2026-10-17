@@ -294,7 +294,6 @@ avila-tech.local
 
 ![Configuración IP de FILE01](../screenshots/15-file01-ip.png)
 
-![FILE01 unido al dominio](../screenshots/16-file01-domain.png)
 
 Se instaló el rol **File Server** para proporcionar almacenamiento compartido a los diferentes departamentos.
 
